@@ -1,0 +1,58 @@
+name: digital_twin_greenhouse
+services:
+  orion:
+    image: fiware/orion:${ORION_VERSION:-3.3.0}
+    hostname: orion
+    container_name: fiware-orion
+    depends_on:
+      - mongo-db
+    ports:
+      - "${ORION_PORT:-1026}:${ORION_PORT:-1026}"
+    command: -dbhost mongo-db -logLevel DEBUG -noCache
+    networks:
+      - greenhouse-network
+
+  mongo-db:
+    image: mongo:${MONGO_DB_VERSION:-6.0}
+    hostname: mongo-db
+    container_name: db-mongo
+    ports:
+      - "${MONGO_DB_PORT:-27017}:${MONGO_DB_PORT:-27017}"
+    volumes:
+      - mongo-db:/data
+    networks:
+      - greenhouse-network
+
+  flask-app:
+    build: ./flask_app
+    container_name: flask-greenhouse
+    ports:
+      - "5000:5000"
+    depends_on:
+      - orion
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - greenhouse-network
+
+  sensor-simulation:
+    build: .
+    container_name: greenhouse-sensors
+    depends_on:
+      - orion
+      - flask-app
+    environment:
+      - ORION_URL=http://orion:1026/v2/op/update
+      - FLASK_ALERT_URL=http://flask-app:5000/alert
+    restart: always
+    networks:
+      - greenhouse-network
+
+networks:
+  greenhouse-network:
+    ipam:
+      config:
+        - subnet: 172.19.0.0/24
+
+volumes:
+  mongo-db: ~
