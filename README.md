@@ -5,7 +5,7 @@ Avec l’accroissement des besoins alimentaires mondiaux, la surveillance intell
 Ce projet propose une simulation réaliste d’un système de **capteurs de température et d’humidité**, intégrant des technologies modernes telles que **Orion Context Broker**, **MongoDB**, **Flask**, et un simulateur Python.  
 
 L'idée est de modéliser un **jumeau numérique (Digital Twin)** capable de surveiller, alerter, stocker et visualiser les données météo en temps réel dans une serre.
-
+ 
 ---
 
 ## 🧠 Objectifs du Projet
