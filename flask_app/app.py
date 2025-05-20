@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
+from datetime import datetime
 import os
 
 app = Flask(__name__)
@@ -14,9 +15,8 @@ alerts_collection = db.alerts
 def receive_alert():
     alert_data = request.get_json()
     alert_data["timestamp"] = datetime.utcnow().isoformat() + "Z"
-    alerts_collection.insert_one(alert_data)
-    print(f"[MongoDB] Alert stored: {alert_data}")
-    return jsonify({"status": "success", "received": alert_data}), 201
+    result = alerts_collection.insert_one(alert_data)
+    return jsonify({"inserted_id": str(result.inserted_id)}), 201
 
 
 @app.route("/sync", methods=["GET"])
